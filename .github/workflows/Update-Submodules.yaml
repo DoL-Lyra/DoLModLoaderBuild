@@ -13,8 +13,8 @@ jobs:
 
       - name: Update Submodules
         run: |
-          git config --global user.email "20642596+sakarie9@users.noreply.github.com"
-          git config --global user.name "Sakari"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           git submodule update --remote --recursive
           git add -v .
           git diff-index --quiet HEAD || git commit -m "Update Submodules"
