@@ -645,7 +645,7 @@ jobs:
         working-directory: ${{ github.workspace }}/ModLoader/out
         run: |
           jq '. += ["mod/Cheat/Cheat-Lyra.mod.zip","mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip"]' modList.json > modList_6_polyfill.json
-          node "${{ github.workspace }}/ModLoader/out/dist-insertTools/insert2html-polyfill.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "modList_6_polyfill.json" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2-comp/BeforeSC2.js" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2-comp/polyfillWebpack.js"
+          node "${{ github.workspace }}/ModLoader/out/dist-insertTools/insert2html-polyfill.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "modList_6_polyfill.json" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2-comp/BeforeSC2.js" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2-comp/polyfillWebpack.js" "ManualPolyfill.js"
           mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.mod-polyfill.html" "${{ github.workspace }}/tmp/polyfill/Degrees of Lewdity.html"
 
       - name: Inject ModLoader With i18n Susato CSD (132)
