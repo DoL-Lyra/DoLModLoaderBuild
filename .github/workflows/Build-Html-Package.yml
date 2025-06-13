@@ -555,17 +555,17 @@ jobs:
           fileName: "ModI18N*.zip"
           out-file-path: "${{ github.workspace }}/ModLoader/out"
 
-      # HACK: workaround
-      - name: Temp workaround with ModI18N-0.5.4.9-chs-1.1.0a
-        working-directory: ${{ github.workspace }}/ModLoader/out
-        run: |
-          modi18n_name=$(basename ModI18N*.zip)
-          unzip "$modi18n_name" -d i18n
-          cd i18n
-          sed -i 's|indexOf(T.item.pattern)]>>）|indexOf(T.item.pattern)]>><</if>>）|' i18n.json
-          sed -i 's|1.1.0a|1.1.0a-fix1|' boot.json
-          zip -r "$modi18n_name" *
-          mv "$modi18n_name" ..
+      # # HACK: workaround
+      # - name: Temp workaround with ModI18N-0.5.4.9-chs-1.1.0a
+      #   working-directory: ${{ github.workspace }}/ModLoader/out
+      #   run: |
+      #     modi18n_name=$(basename ModI18N*.zip)
+      #     unzip "$modi18n_name" -d i18n
+      #     cd i18n
+      #     sed -i 's|indexOf(T.item.pattern)]>>）|indexOf(T.item.pattern)]>><</if>>）|' i18n.json
+      #     sed -i 's|1.1.0a|1.1.0a-fix1|' boot.json
+      #     zip -r "$modi18n_name" *
+      #     mv "$modi18n_name" ..
 
       - name: Inject i18n-chs
         working-directory: ${{ github.workspace }}/ModLoader/out
