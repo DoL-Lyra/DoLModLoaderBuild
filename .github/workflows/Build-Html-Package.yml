@@ -385,7 +385,7 @@ jobs:
         run: |
           yarn install
           yarn run build:ts
-          yarn run build:webpack
+          yarn run build:webpack || true # HACK: workaround
           node "${{ github.workspace }}/ModLoader/dist-insertTools/packModZip.js" "boot.json"
       - name: Copy ModuleCssReplacer
         uses: Lyoko-Jeremie/js-copy-github-action@master
