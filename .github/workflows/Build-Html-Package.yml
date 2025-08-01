@@ -351,12 +351,11 @@ jobs:
           target: ${{ github.workspace }}/ModLoader/out
 
       - name: Build I18nTweeReplacer
-        continue-on-error: true # HACK
         working-directory: ${{ github.workspace }}/ModLoader/mod/I18nTweeReplacer
         run: |
           yarn install
           yarn run build:ts
-          yarn run build:webpack
+          yarn run build:webpack || true # HACK: workaround
           node "${{ github.workspace }}/ModLoader/dist-insertTools/packModZip.js" "boot.json"
       - name: Copy I18nTweeReplacer
         uses: Lyoko-Jeremie/js-copy-github-action@master
