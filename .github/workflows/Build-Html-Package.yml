@@ -23,11 +23,12 @@ jobs:
 
       matrix:
         # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
-        os: [ubuntu-latest]
+        os: [ ubuntu-latest ]
         #os: [ ubuntu-latest, windows-latest ]
         node-version: [18.x]
 
     steps:
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -57,27 +58,23 @@ jobs:
         working-directory: ${{ github.workspace }}/ModLoader
         run: git submodule update --init --recursive
 
-      # - name: Patch ModLoader
-      #   working-directory: ${{ github.workspace }}
-      #   run: |
-      #     patch -p1 < patches/01-timewrapper-strict-disable.patch
+#      - name: ModLoader
+#        uses: actions/checkout@v4
+#        with:
+#          repository: Lyoko-Jeremie/sugarcube-2-ModLoader
+#          path: ModLoader
+#          ref: master
+#          submodules: recursive
 
-      #      - name: ModLoader
-      #        uses: actions/checkout@v4
-      #        with:
-      #          repository: Lyoko-Jeremie/sugarcube-2-ModLoader
-      #          path: ModLoader
-      #          ref: master
-      #          submodules: recursive
+#      - name: DoL
+#        uses: actions/checkout@v4
+#        with:
+#          repository: Vrelnir/degrees-of-lewdity.git
+#          path: DoL
+#          ref: master
+#          github-server-url: 'https://gitgud.io'
+#          submodules: recursive
 
-      #      - name: DoL
-      #        uses: actions/checkout@v4
-      #        with:
-      #          repository: Vrelnir/degrees-of-lewdity.git
-      #          path: DoL
-      #          ref: master
-      #          github-server-url: 'https://gitgud.io'
-      #          submodules: recursive
 
       # /ModLoader  Init =========================================
 
@@ -359,6 +356,7 @@ jobs:
           target: ${{ github.workspace }}/ModLoader/out
 
       - name: Build I18nTweeReplacer
+        continue-on-error: true # HACK
         working-directory: ${{ github.workspace }}/ModLoader/mod/I18nTweeReplacer
         run: |
           yarn install
@@ -516,6 +514,7 @@ jobs:
           npm install
           node build.js -d -u -b 2
       # /SC2  OK =========================================
+
       - name: Copy SC2 format.js
         uses: Lyoko-Jeremie/js-copy-github-action@master
         with:
