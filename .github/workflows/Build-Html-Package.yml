@@ -41,11 +41,6 @@ jobs:
         with:
           submodules: true
 
-      - uses: actions/checkout@v4
-        with:
-          ref: assets
-          path: assets
-
       - name: SugarCube-2
         uses: actions/checkout@v4
         with:
@@ -604,7 +599,16 @@ jobs:
           latest: true
           fileName: "CombatStatusDisplay-Lyra-*.mod.zip"
           out-file-path: "${{ github.workspace }}/ModLoader/out"
-      - name: Get Susato
+
+      - name: Get Mods
+        uses: robinraju/release-downloader@v1.12
+        with:
+          repository: "DoL-Lyra/assets"
+          latest: true
+          fileName: "susato-model_ZH_ver*.mod.zip"
+          out-file-path: '${{ github.workspace }}/assets'
+
+      - name: Copy Susato Model
         run: |
           cp ${{ github.workspace }}/assets/susato-model_ZH_ver*.mod.zip ${{ github.workspace }}/ModLoader/out/Susato_zh.mod.zip
 
