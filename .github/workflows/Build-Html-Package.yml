@@ -51,7 +51,16 @@ jobs:
 
       - name: init ModLoader
         working-directory: ${{ github.workspace }}/ModLoader
-        run: git submodule update --init --recursive
+        run: |
+          git submodule update --init --recursive
+          rm -rf mod/ModLoaderGui
+
+      # replace ModLoaderGui with our modified version
+      - name: Replace ModLoaderGui
+        uses: actions/checkout@v4
+        with:
+          repository: DoL-Lyra/sugarcube-2-ModLoaderGui
+          path: ${{ github.workspace }}/ModLoader/mod/ModLoaderGui
 
 #      - name: ModLoader
 #        uses: actions/checkout@v4
@@ -527,17 +536,6 @@ jobs:
       # /DoL  OK =========================================
 
       # /Start Lyra Modify =========================================
-      - name: MKDIR
-        run: |
-          mkdir ${{ github.workspace }}/output
-          mkdir ${{ github.workspace }}/tmp
-          mkdir ${{ github.workspace }}/tmp/0 # i18n
-          mkdir ${{ github.workspace }}/tmp/2 # cheat
-          mkdir ${{ github.workspace }}/tmp/4 # csd
-          mkdir ${{ github.workspace }}/tmp/6 # cheat+csd
-          mkdir ${{ github.workspace }}/tmp/polyfill # polyfill+cheat+csd
-          mkdir ${{ github.workspace }}/tmp/132 # susato+csd
-          mkdir ${{ github.workspace }}/tmp/134 # susato+cheat+csd
 
       # Make i18n builtin
       - name: Download i18n-chs
@@ -547,18 +545,6 @@ jobs:
           latest: true
           fileName: "ModI18N*.zip"
           out-file-path: "${{ github.workspace }}/ModLoader/out"
-
-      # # HACK: workaround
-      # - name: Temp workaround with ModI18N-0.5.4.9-chs-1.1.0a
-      #   working-directory: ${{ github.workspace }}/ModLoader/out
-      #   run: |
-      #     modi18n_name=$(basename ModI18N*.zip)
-      #     unzip "$modi18n_name" -d i18n
-      #     cd i18n
-      #     sed -i 's|indexOf(T.item.pattern)]>>）|indexOf(T.item.pattern)]>><</if>>）|' i18n.json
-      #     sed -i 's|1.1.0a|1.1.0a-fix1|' boot.json
-      #     zip -r "$modi18n_name" *
-      #     mv "$modi18n_name" ..
 
       - name: Inject i18n-chs
         working-directory: ${{ github.workspace }}/ModLoader/out
@@ -572,6 +558,8 @@ jobs:
 
           mkdir mod/ModI18N
           mv ModI18N*.zip mod/ModI18N/ModI18N.mod.zip
+
+          ${{ github.workspace }}/inject_mod_json.sh mod/ModI18N/ModI18N.mod.zip
 
           jq '. += ["mod/ModI18N/ModI18N.mod.zip"]' modList.json > modList_modified.json
           # cat modList_modified.json
@@ -599,47 +587,18 @@ jobs:
           fileName: "CombatStatusDisplay-Lyra-*.mod.zip"
           out-file-path: "${{ github.workspace }}/ModLoader/out"
 
-      - name: Get Mods
-        uses: robinraju/release-downloader@v1.12
-        with:
-          repository: "DoL-Lyra/assets"
-          latest: true
-          fileName: "susato-model_ZH_ver*.mod.zip"
-          out-file-path: '${{ github.workspace }}/assets'
-
-      - name: Copy Susato Model
-        run: |
-          cp ${{ github.workspace }}/assets/susato-model_ZH_ver*.mod.zip ${{ github.workspace }}/ModLoader/out/Susato_zh.mod.zip
-
       # Rename and move mods
       - working-directory: ${{ github.workspace }}/ModLoader/out
         run: |
           mkdir mod/Cheat
           mv Cheat-Lyra-*.mod.zip mod/Cheat/Cheat-Lyra.mod.zip
 
+          ${{ github.workspace }}/inject_mod_json.sh mod/Cheat/Cheat-Lyra.mod.zip
+
           mkdir mod/CombatStatusDisplay
           mv CombatStatusDisplay-Lyra-*.mod.zip mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip
 
-          mkdir mod/Susato
-          mv Susato_zh.mod.zip mod/Susato/Susato_zh.mod.zip
-
-      - name: Inject ModLoader With i18n Cheat (2)
-        working-directory: ${{ github.workspace }}/ModLoader/out
-        run: |
-          CODE=2
-          jq '. += ["mod/Cheat/Cheat-Lyra.mod.zip"]' modList.json > modList_$CODE.json
-
-          node "${{ github.workspace }}/ModLoader/out/dist-insertTools/insert2html.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "modList_$CODE.json" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2/BeforeSC2.js"
-          mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.mod.html" "${{ github.workspace }}/tmp/$CODE/Degrees of Lewdity.html"
-
-      - name: Inject ModLoader With i18n CSD (4)
-        working-directory: ${{ github.workspace }}/ModLoader/out
-        run: |
-          CODE=4
-          jq '. += ["mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip"]' modList.json > modList_$CODE.json
-
-          node "${{ github.workspace }}/ModLoader/out/dist-insertTools/insert2html.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "modList_$CODE.json" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2/BeforeSC2.js"
-          mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.mod.html" "${{ github.workspace }}/tmp/$CODE/Degrees of Lewdity.html"
+          ${{ github.workspace }}/inject_mod_json.sh mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip
 
       - name: Inject ModLoader With i18n Cheat CSD (6)
         working-directory: ${{ github.workspace }}/ModLoader/out
@@ -657,28 +616,10 @@ jobs:
           node "${{ github.workspace }}/ModLoader/out/dist-insertTools/insert2html-polyfill.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "modList_6_polyfill.json" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2-comp/BeforeSC2.js" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2-comp/polyfillWebpack.js" "ManualPolyfill.js"
           mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.mod-polyfill.html" "${{ github.workspace }}/tmp/polyfill/Degrees of Lewdity.html"
 
-      - name: Inject ModLoader With i18n Susato CSD (132)
-        working-directory: ${{ github.workspace }}/ModLoader/out
-        run: |
-          CODE=132
-          jq '. += ["mod/Susato/Susato_zh.mod.zip","mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip"]' modList.json > modList_$CODE.json
-
-          node "${{ github.workspace }}/ModLoader/out/dist-insertTools/insert2html.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "modList_$CODE.json" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2/BeforeSC2.js"
-          mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.mod.html" "${{ github.workspace }}/tmp/$CODE/Degrees of Lewdity.html"
-
-      - name: Inject ModLoader With i18n Susato Cheat CSD (134)
-        working-directory: ${{ github.workspace }}/ModLoader/out
-        run: |
-          CODE=134
-          jq '. += ["mod/Susato/Susato_zh.mod.zip","mod/Cheat/Cheat-Lyra.mod.zip","mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip"]' modList.json > modList_$CODE.json
-
-          node "${{ github.workspace }}/ModLoader/out/dist-insertTools/insert2html.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "modList_$CODE.json" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2/BeforeSC2.js"
-          mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.mod.html" "${{ github.workspace }}/tmp/$CODE/Degrees of Lewdity.html"
-
       # Package
       - name: Packages
         run: |
-          ver=( 0 2 4 6 132 134 )
+          ver=( 6 )
           for v in "${ver[@]}"
           do
             # cp ${{ github.workspace }}/DoL/style.css ${{ github.workspace }}/tmp/$v/
