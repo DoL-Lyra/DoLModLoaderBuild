@@ -63,6 +63,12 @@ jobs:
           path: ${{ github.workspace }}/ModLoader/mod/ModLoaderGui
           submodules: recursive
 
+      # patches
+      - name: Patch ModLoader
+        working-directory: ${{ github.workspace }}/ModLoader
+        run: |
+          git apply "${{ github.workspace }}/patches/filter_mods_in_early_load.patch"
+
 #      - name: ModLoader
 #        uses: actions/checkout@v4
 #        with:

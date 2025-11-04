@@ -1,0 +1,13 @@
+diff --git a/src/BeforeSC2/ModLoader.ts b/src/BeforeSC2/ModLoader.ts
+index 82264e3..49f4748 100644
+--- a/src/BeforeSC2/ModLoader.ts
++++ b/src/BeforeSC2/ModLoader.ts
+@@ -542,6 +542,8 @@ export class ModLoader {
+ 
+     private async initModInjectEarlyLoadInDomScript() {
+         let toLoadModeList = this.modReadCache.clone();
++        // Filter all mods first to apply canLoadThisMod check (e.g., for disabled Local mods)
++        toLoadModeList = await this.filterModCanLoad(toLoadModeList);
+         // TODO re-order mod list on there (impl mod re-order on there)
+         this.modCache = new ModOrderContainer();
+         while (toLoadModeList.size > 0) {
