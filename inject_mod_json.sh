@@ -10,6 +10,7 @@
 
 # --- 参数定义 ---
 ZIP_FILE="$1"
+ZIP_FILE=$(realpath "$ZIP_FILE")
 JSON_FILE_IN_ZIP="boot.json"
 NEW_KEY="modLoaderManageable"
 NEW_VALUE="true"
@@ -22,22 +23,22 @@ set -euo pipefail
 
 # --- 参数校验 ---
 if [ "$#" -ne 1 ]; then
-    echo "错误: 需要提供 1 个参数。"
-    echo "用法: $0 <zip文件>"
-    exit 1
+  echo "错误: 需要提供 1 个参数。"
+  echo "用法: $0 <zip文件>"
+  exit 1
 fi
 
 if [ ! -f "$ZIP_FILE" ]; then
-    echo "错误: ZIP 文件 '$ZIP_FILE' 不存在。"
-    exit 1
+  echo "错误: ZIP 文件 '$ZIP_FILE' 不存在。"
+  exit 1
 fi
 
 # --- 检查依赖工具 ---
 for cmd in zip unzip jq; do
-    if ! command -v "$cmd" &> /dev/null; then
-        echo "错误: 依赖工具 '$cmd' 未安装，请先安装它。"
-        exit 1
-    fi
+  if ! command -v "$cmd" &>/dev/null; then
+    echo "错误: 依赖工具 '$cmd' 未安装，请先安装它。"
+    exit 1
+  fi
 done
 
 # --- 核心逻辑 ---
@@ -58,29 +59,30 @@ unzip -q "$ZIP_FILE" "$JSON_FILE_IN_ZIP" -d "$TEMP_DIR"
 # 检查文件是否真的被解压出来了
 EXTRACTED_FILE="$TEMP_DIR/$JSON_FILE_IN_ZIP"
 if [ ! -f "$EXTRACTED_FILE" ]; then
-    echo "错误: 无法在 '$ZIP_FILE' 中找到文件 '$JSON_FILE_IN_ZIP'。"
-    exit 1
+  echo "错误: 无法在 '$ZIP_FILE' 中找到文件 '$JSON_FILE_IN_ZIP'。"
+  exit 1
 fi
 
 # 3. 使用 jq 添加键值对
 # 创建一个新的临时 JSON 文件来存放修改后的内容
 MODIFIED_FILE="${EXTRACTED_FILE}.modified"
 echo "3. 正在向 JSON 文件添加键值对: '$NEW_KEY': '$NEW_VALUE'..."
-jq --arg key "$NEW_KEY" --arg value "$NEW_VALUE" '. + {($key): $value}' "$EXTRACTED_FILE" > "$MODIFIED_FILE"
+jq --arg key "$NEW_KEY" --arg value "$NEW_VALUE" '. + {($key): $value}' "$EXTRACTED_FILE" >"$MODIFIED_FILE"
 
 # 4. 将修改后的文件更新回 ZIP 压缩包
 # 首先，我们需要进入临时目录，这样 zip 命令才能使用正确的相对路径
 echo "4. 正在将修改后的文件更新回 '$ZIP_FILE'..."
 (
-    cd "$TEMP_DIR"
-    # 将修改后的文件覆盖原文件
-    mv "$MODIFIED_FILE" "$JSON_FILE_IN_ZIP"
-    # 使用 zip 命令更新压缩包中的文件
-    # -u 选项表示只更新修改过的文件或添加新文件
-    zip -q -u "$ZIP_FILE" "$JSON_FILE_IN_ZIP"
+  cd "$TEMP_DIR"
+  # 将修改后的文件覆盖原文件
+  mv "$MODIFIED_FILE" "$JSON_FILE_IN_ZIP"
+  # 使用 zip 命令更新压缩包中的文件
+  # -u 选项表示只更新修改过的文件或添加新文件
+  zip -u "$ZIP_FILE" "$JSON_FILE_IN_ZIP"
 )
 
 # 5. 清理工作由 trap 命令自动完成
 echo "5. 操作成功！临时目录将自动清理。"
 
 exit 0
+
