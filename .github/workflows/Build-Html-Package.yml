@@ -61,6 +61,7 @@ jobs:
         with:
           repository: DoL-Lyra/sugarcube-2-ModLoaderGui
           path: ${{ github.workspace }}/ModLoader/mod/ModLoaderGui
+          submodules: recursive
 
 #      - name: ModLoader
 #        uses: actions/checkout@v4
