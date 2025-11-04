@@ -537,6 +537,17 @@ jobs:
       # /DoL  OK =========================================
 
       # /Start Lyra Modify =========================================
+      - name: MKDIR
+        run: |
+          mkdir ${{ github.workspace }}/output
+          mkdir ${{ github.workspace }}/tmp
+          # mkdir ${{ github.workspace }}/tmp/0 # i18n
+          # mkdir ${{ github.workspace }}/tmp/2 # cheat
+          # mkdir ${{ github.workspace }}/tmp/4 # csd
+          mkdir ${{ github.workspace }}/tmp/6 # cheat+csd
+          mkdir ${{ github.workspace }}/tmp/polyfill # polyfill+cheat+csd
+          # mkdir ${{ github.workspace }}/tmp/132 # susato+csd
+          # mkdir ${{ github.workspace }}/tmp/134 # susato+cheat+csd
 
       # Make i18n builtin
       - name: Download i18n-chs
@@ -565,13 +576,10 @@ jobs:
           jq '. += ["mod/ModI18N/ModI18N.mod.zip"]' modList.json > modList_modified.json
           # cat modList_modified.json
           mv modList_modified.json modList.json
-      - name: Inject ModLoader With i18n
-        working-directory: ${{ github.workspace }}/ModLoader/out
-        run: |
-          node "${{ github.workspace }}/ModLoader/out/dist-insertTools/insert2html.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "modList.json" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2/BeforeSC2.js"
-          mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.mod.html" "${{ github.workspace }}/tmp/0/Degrees of Lewdity.html"
+
       # End Make i18n builtin
       # Inject others
+
       # Download mods
       - name: Download Cheat
         uses: robinraju/release-downloader@v1.8
@@ -620,16 +628,13 @@ jobs:
       # Package
       - name: Packages
         run: |
-          ver=( 6 )
-          for v in "${ver[@]}"
-          do
-            # cp ${{ github.workspace }}/DoL/style.css ${{ github.workspace }}/tmp/$v/
-            cp -r ${{ github.workspace }}/DoL/img ${{ github.workspace }}/tmp/$v/
-            pushd ${{ github.workspace }}/tmp/$v/
-            zip -r DoL-ModLoader-${{ env.ver_dol }}-${{ env.ver_chs }}-$v.zip *
-            mv DoL-ModLoader-*.zip ${{ github.workspace }}/output/
-            popd
-          done
+          # cp ${{ github.workspace }}/DoL/style.css ${{ github.workspace }}/tmp/6/
+          cp -r ${{ github.workspace }}/DoL/img ${{ github.workspace }}/tmp/6/
+          pushd ${{ github.workspace }}/tmp/6/
+          zip -r DoL-ModLoader-${{ env.ver_dol }}-${{ env.ver_chs }}.zip *
+          mv DoL-ModLoader-*.zip ${{ github.workspace }}/output/
+          popd
+
 
       # Package Polyfill
       - name: Package Polyfill
