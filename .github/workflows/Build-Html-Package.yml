@@ -23,12 +23,11 @@ jobs:
 
       matrix:
         # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
-        os: [ ubuntu-latest ]
+        os: [ubuntu-latest]
         #os: [ ubuntu-latest, windows-latest ]
         node-version: [18.x]
 
     steps:
-
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -46,7 +45,7 @@ jobs:
         with:
           repository: Lyoko-Jeremie/sugarcube-2_Vrelnir
           path: SC2
-          ref: TS
+          ref: TS2
           #submodules: recursive
 
       - name: init ModLoader
@@ -69,23 +68,22 @@ jobs:
         run: |
           git apply "${{ github.workspace }}/patches/filter_mods_in_early_load.patch"
 
-#      - name: ModLoader
-#        uses: actions/checkout@v4
-#        with:
-#          repository: Lyoko-Jeremie/sugarcube-2-ModLoader
-#          path: ModLoader
-#          ref: master
-#          submodules: recursive
+      #      - name: ModLoader
+      #        uses: actions/checkout@v4
+      #        with:
+      #          repository: Lyoko-Jeremie/sugarcube-2-ModLoader
+      #          path: ModLoader
+      #          ref: master
+      #          submodules: recursive
 
-#      - name: DoL
-#        uses: actions/checkout@v4
-#        with:
-#          repository: Vrelnir/degrees-of-lewdity.git
-#          path: DoL
-#          ref: master
-#          github-server-url: 'https://gitgud.io'
-#          submodules: recursive
-
+      #      - name: DoL
+      #        uses: actions/checkout@v4
+      #        with:
+      #          repository: Vrelnir/degrees-of-lewdity.git
+      #          path: DoL
+      #          ref: master
+      #          github-server-url: 'https://gitgud.io'
+      #          submodules: recursive
 
       # /ModLoader  Init =========================================
 
@@ -524,7 +522,6 @@ jobs:
           npm install
           node build.js -d -u -b 2
       # /SC2  OK =========================================
-
       - name: Copy SC2 format.js
         uses: Lyoko-Jeremie/js-copy-github-action@master
         with:
@@ -640,7 +637,6 @@ jobs:
           zip -r DoL-ModLoader-${{ env.ver_dol }}-${{ env.ver_chs }}.zip *
           mv DoL-ModLoader-*.zip ${{ github.workspace }}/output/
           popd
-
 
       # Package Polyfill
       - name: Package Polyfill
