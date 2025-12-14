@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: ["master"]
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: "Should publish release"
+        required: true
+        type: boolean
+        default: true
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -660,6 +666,7 @@ jobs:
           format: "YYYY-MM-DD-HH-mm-ss"
 
       - name: Archive Release (Releases Auto)
+        if: github.event_name != 'workflow_dispatch' || inputs.publish_release
         uses: softprops/action-gh-release@v2
         with:
           files: |
