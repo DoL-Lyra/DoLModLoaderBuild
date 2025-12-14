@@ -29,19 +29,19 @@ jobs:
 
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
 
       - name: corepack enable
         run: corepack enable
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           submodules: true
 
       - name: SugarCube-2
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: Lyoko-Jeremie/sugarcube-2_Vrelnir
           path: SC2
@@ -56,7 +56,7 @@ jobs:
 
       # replace ModLoaderGui with our modified version
       - name: Replace ModLoaderGui
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: DoL-Lyra/sugarcube-2-ModLoaderGui
           path: ${{ github.workspace }}/ModLoader/mod/ModLoaderGui
@@ -651,7 +651,7 @@ jobs:
       # make package  OK =========================================
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Html Package-${{ github.sha }}
           path: ${{ github.workspace }}/output/DoL-ModLoader-${{ env.ver_dol }}-${{ env.ver_chs }}*.zip
@@ -664,7 +664,7 @@ jobs:
           format: "YYYY-MM-DD-HH-mm-ss"
 
       - name: Archive Release (Releases Auto)
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             output/DoL-ModLoader-${{ env.ver_dol }}-${{ env.ver_chs }}*.zip
