@@ -574,9 +574,7 @@ jobs:
           mkdir mod/ModI18N
           mv ModI18N*.zip mod/ModI18N/ModI18N.mod.zip
 
-          ${{ github.workspace }}/inject_mod_json.sh mod/ModI18N/ModI18N.mod.zip
-
-          jq '. += ["mod/ModI18N/ModI18N.mod.zip"]' modList.json > modList_modified.json
+          sed 's/]$/"mod\/ModI18N\/ModI18N.mod.zip",\n]/' modList.json > modList_modified.json
           # cat modList_modified.json
           mv modList_modified.json modList.json
 
@@ -605,18 +603,15 @@ jobs:
           mkdir mod/Cheat
           mv Cheat-Lyra-*.mod.zip mod/Cheat/Cheat-Lyra.mod.zip
 
-          ${{ github.workspace }}/inject_mod_json.sh mod/Cheat/Cheat-Lyra.mod.zip
-
           mkdir mod/CombatStatusDisplay
           mv CombatStatusDisplay-Lyra-*.mod.zip mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip
-
-          ${{ github.workspace }}/inject_mod_json.sh mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip
 
       - name: Inject ModLoader With i18n Cheat CSD (6)
         working-directory: ${{ github.workspace }}/ModLoader/out
         run: |
           CODE=6
-          jq '. += ["mod/Cheat/Cheat-Lyra.mod.zip","mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip"]' modList.json > modList_$CODE.json
+          sed 's/]$/"mod\/Cheat\/Cheat-Lyra.mod.zip",\n"mod\/CombatStatusDisplay\/CombatStatusDisplay-Lyra.mod.zip",\n]/' modList.json > modList_$CODE.json
+          # jq '. += ["mod/Cheat/Cheat-Lyra.mod.zip","mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip"]' modList.json > modList_$CODE.json
 
           node "${{ github.workspace }}/ModLoader/out/dist-insertTools/insert2html.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "modList_$CODE.json" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2/BeforeSC2.js"
           mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.mod.html" "${{ github.workspace }}/tmp/$CODE/Degrees of Lewdity.html"
@@ -624,7 +619,8 @@ jobs:
       - name: Inject ModLoader-compatibility With i18n Cheat CSD (6-polyfill)
         working-directory: ${{ github.workspace }}/ModLoader/out
         run: |
-          jq '. += ["mod/Cheat/Cheat-Lyra.mod.zip","mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip"]' modList.json > modList_6_polyfill.json
+          sed 's/]$/"mod\/Cheat\/Cheat-Lyra.mod.zip",\n"mod\/CombatStatusDisplay\/CombatStatusDisplay-Lyra.mod.zip",\n]/' modList.json > modList_6_polyfill.json
+          # jq '. += ["mod/Cheat/Cheat-Lyra.mod.zip","mod/CombatStatusDisplay/CombatStatusDisplay-Lyra.mod.zip"]' modList.json > modList_6_polyfill.json
           node "${{ github.workspace }}/ModLoader/out/dist-insertTools/insert2html-polyfill.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "modList_6_polyfill.json" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2-comp/BeforeSC2.js" "${{ github.workspace }}/ModLoader/out/dist-BeforeSC2-comp/polyfillWebpack.js" "ManualPolyfill.js"
           mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.mod-polyfill.html" "${{ github.workspace }}/tmp/polyfill/Degrees of Lewdity.html"
 
