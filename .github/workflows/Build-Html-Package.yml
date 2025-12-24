@@ -540,7 +540,7 @@ jobs:
         working-directory: ${{ github.workspace }}/DoL
         run: |
           node "${{ github.workspace }}/ModLoader/out/dist-insertTools/sc2PatchTool.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "${{ github.workspace }}/SC2/locale/chs.js"
-          mv ${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.sc2patch.html ${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html
+          mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.sc2patch.html" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html"
 
       # /DoL  OK =========================================
 
