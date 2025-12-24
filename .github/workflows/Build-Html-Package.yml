@@ -533,14 +533,14 @@ jobs:
 
       - name: Build DoL (Linux)
         working-directory: ${{ github.workspace }}/DoL
-        run: ./compile.sh && cp Degrees\ of\ Lewdity\ *-dirty.html "Degrees of Lewdity VERSION.html"
+        run: ./compile.sh && cp Degrees\ of\ Lewdity\ *.html "Degrees of Lewdity VERSION.html"
 
       # /DoL patch SC2
       - name: Patch SC2 In DoL Html
         working-directory: ${{ github.workspace }}/DoL
         run: |
           node "${{ github.workspace }}/ModLoader/out/dist-insertTools/sc2PatchTool.js" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html" "${{ github.workspace }}/SC2/locale/chs.js"
-          mv ${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.sc2patch.html ${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html
+          mv "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html.sc2patch.html" "${{ github.workspace }}/DoL/Degrees of Lewdity VERSION.html"
 
       # /DoL  OK =========================================
 
@@ -665,7 +665,7 @@ jobs:
           format: "YYYY-MM-DD-HH-mm-ss"
 
       - name: Archive Release (Releases Auto)
-        if: github.event_name != 'workflow_dispatch' || inputs.publish_release
+        if: (github.event_name == 'workflow_dispatch' && inputs.publish_release) || github.event_name == 'workflow_run'
         uses: softprops/action-gh-release@v2
         with:
           files: |

@@ -15,7 +15,35 @@ jobs:
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git submodule update --remote --recursive
-          git add -v .
+
+          # Add upstream remote
+          git remote add upstream https://github.com/Lyoko-Jeremie/DoLModLoaderBuild.git
+          git fetch upstream master || true
+
+          # Get commit hashes from upstream
+          DOL_HASH=$(git ls-tree upstream/master DOL | awk '{print $3}')
+          MODLOADER_HASH=$(git ls-tree upstream/master ModLoader | awk '{print $3}')
+
+          echo "Syncing to upstream versions:"
+          echo "DoL: $DOL_HASH"
+          echo "ModLoader: $MODLOADER_HASH"
+
+          # Update DoL
+          if [ -n "$DOL_HASH" ]; then
+            cd DoL
+            git fetch origin
+            git checkout "$DOL_HASH"
+            cd ..
+          fi
+
+          # Update ModLoader
+          if [ -n "$MODLOADER_HASH" ]; then
+            cd ModLoader
+            git fetch origin
+            git checkout "$MODLOADER_HASH"
+            cd ..
+          fi
+
+          git add DoL ModLoader
           git diff-index --quiet HEAD || git commit -m "Update Submodules"
           git push
