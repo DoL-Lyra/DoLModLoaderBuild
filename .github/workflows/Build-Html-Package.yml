@@ -533,7 +533,7 @@ jobs:
 
       - name: Build DoL (Linux)
         working-directory: ${{ github.workspace }}/DoL
-        run: ./compile.sh && cp Degrees\ of\ Lewdity\ *-dirty.html "Degrees of Lewdity VERSION.html"
+        run: ./compile.sh && cp Degrees\ of\ Lewdity\ *.html "Degrees of Lewdity VERSION.html"
 
       # /DoL patch SC2
       - name: Patch SC2 In DoL Html

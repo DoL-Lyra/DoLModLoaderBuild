@@ -1,4 +1,4 @@
-name: Update Submodules
+name: Sync Submodules with Target
 
 on:
   workflow_dispatch:
@@ -7,15 +7,54 @@ jobs:
   update-submodules:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
+          fetch-depth: 0 # 获取完整的历史记录，防止 checkout 时找不到 commit
 
-      - name: Update Submodules
+      - name: Sync with Target Repo
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git submodule update --remote --recursive
-          git add -v .
-          git diff-index --quiet HEAD || git commit -m "Update Submodules"
-          git push
+
+          git remote add upstream-target https://github.com/Lyoko-Jeremie/DoLModLoaderBuild.git
+          git fetch upstream-target master
+
+          # 获取目标仓库中 DoL 和 ModLoader 具体锁定的 Commit Hash
+          # git ls-tree 用于查看远程仓库某个路径指向的对象 ID (即 submodule 的 commit hash)
+          echo "Fetching target commit hashes..."
+          TARGET_DOL_HASH=$(git ls-tree upstream-target/master DoL | awk '{print $3}')
+          TARGET_ML_HASH=$(git ls-tree upstream-target/master ModLoader | awk '{print $3}')
+          echo "Target DoL Hash: $TARGET_DOL_HASH"
+          echo "Target ModLoader Hash: $TARGET_ML_HASH"
+
+          # 更新 DoL 子模块
+          if [ -n "$TARGET_DOL_HASH" ]; then
+            cd DoL
+            git fetch origin # 确保子模块有最新的 commit 对象
+            git checkout "$TARGET_DOL_HASH"
+            cd ..
+          else
+            echo "Warning: Could not find DoL hash in target repo"
+          fi
+
+          # 更新 ModLoader 子模块
+          if [ -n "$TARGET_ML_HASH" ]; then
+            cd ModLoader
+            git fetch origin
+            git checkout "$TARGET_ML_HASH"
+            cd ..
+          else
+            echo "Warning: Could not find ModLoader hash in target repo"
+          fi
+
+          # 提交更改
+          git add DoL ModLoader
+
+          # 检查是否有变化，如果有则提交
+          if git diff-index --quiet HEAD; then
+            echo "No changes to commit. Submodules are already in sync."
+          else
+            git commit -m "Sync submodules with Lyoko-Jeremie/DoLModLoaderBuild"
+            git push
+          fi
